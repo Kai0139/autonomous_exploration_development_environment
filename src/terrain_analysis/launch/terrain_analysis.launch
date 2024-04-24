@@ -26,8 +26,8 @@
     <param name="vehicleHeight" type="double" value="1.5" />
     <param name="voxelPointUpdateThre" type="int" value="100" />
     <param name="voxelTimeUpdateThre" type="double" value="2.0" />
-    <param name="minRelZ" type="double" value="-2.5" />
-    <param name="maxRelZ" type="double" value="2.0" />
+    <param name="minRelZ" type="double" value="-1.5" />
+    <param name="maxRelZ" type="double" value="1.0" />
     <param name="disRatioZ" type="double" value="0.2" />
     <param name="reg_scan_topic" type="string" value="$(arg reg_scan_topic)"/>
     <param name="odom_topic" type="string" value="$(arg odom_topic)"/>
