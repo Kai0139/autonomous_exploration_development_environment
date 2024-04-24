@@ -91,6 +91,8 @@ bool pathInit = false;
 bool navFwd = true;
 double switchTime = 0;
 
+string odom_topic;
+
 nav_msgs::Path path;
 
 void odomHandler(const nav_msgs::Odometry::ConstPtr& odomIn)
@@ -212,8 +214,9 @@ int main(int argc, char** argv)
   nhPrivate.getParam("autonomyMode", autonomyMode);
   nhPrivate.getParam("autonomySpeed", autonomySpeed);
   nhPrivate.getParam("joyToSpeedDelay", joyToSpeedDelay);
+  nhPrivate.getParam("odom_topic", odom_topic);
 
-  ros::Subscriber subOdom = nh.subscribe<nav_msgs::Odometry> ("/state_estimation", 5, odomHandler);
+  ros::Subscriber subOdom = nh.subscribe<nav_msgs::Odometry> (odom_topic, 5, odomHandler);
 
   ros::Subscriber subPath = nh.subscribe<nav_msgs::Path> ("/path", 5, pathHandler);
 

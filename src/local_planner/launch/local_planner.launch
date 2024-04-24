@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="sensorOffsetX" default="0"/>
+  <arg name="sensorOffsetX" default="-0.1"/>
   <arg name="sensorOffsetY" default="0"/>
   <arg name="cameraOffsetZ" default="0"/>
   <arg name="twoWayDrive" default="true"/>
@@ -10,11 +10,13 @@
   <arg name="joyToSpeedDelay" default="2.0"/>
   <arg name="goalX" default="0"/>
   <arg name="goalY" default="0"/>
+  <arg name="reg_scan_topic" default="/cloud_registered"/>
+  <arg name="odom_topic" default="/Odometry"/>
 
   <node pkg="local_planner" type="localPlanner" name="localPlanner" output="screen" required="true">
     <param name="pathFolder" type="string" value="$(find local_planner)/paths" />
-    <param name="vehicleLength" type="double" value="0.6" />
-    <param name="vehicleWidth" type="double" value="0.6" />
+    <param name="vehicleLength" type="double" value="1.5" />
+    <param name="vehicleWidth" type="double" value="1.2" />
     <param name="sensorOffsetX" value="$(arg sensorOffsetX)" />
     <param name="sensorOffsetY" value="$(arg sensorOffsetY)" />
     <param name="twoWayDrive" value="$(arg twoWayDrive)" />
@@ -51,6 +53,8 @@
     <param name="goalClearRange" type="double" value="0.5" />
     <param name="goalX" type="double" value="$(arg goalX)" />
     <param name="goalY" type="double" value="$(arg goalY)" />
+    <param name="reg_scan_topic" type="string" value="$(arg reg_scan_topic)"/>
+    <param name="odom_topic" type="string" value="$(arg odom_topic)"/>
   </node>
 
   <node pkg="local_planner" type="pathFollower" name="pathFollower" output="screen" required="true">
@@ -82,6 +86,7 @@
     <param name="autonomyMode" value="$(arg autonomyMode)" />
     <param name="autonomySpeed" value="$(arg autonomySpeed)" />
     <param name="joyToSpeedDelay" value="$(arg joyToSpeedDelay)" />
+    <param name="odom_topic" type="string" value="$(arg odom_topic)"/>
   </node>
 
   <node pkg="tf" type="static_transform_publisher" name="vehicleTransPublisher" args="-$(arg sensorOffsetX) -$(arg sensorOffsetY) 0 0 0 0 /sensor /vehicle 1000"/>

@@ -68,6 +68,9 @@ const int planarVoxelWidth = 51;
 int planarVoxelHalfWidth = (planarVoxelWidth - 1) / 2;
 const int planarVoxelNum = planarVoxelWidth * planarVoxelWidth;
 
+string odom_topic;
+string reg_scan_topic;
+
 pcl::PointCloud<pcl::PointXYZI>::Ptr
     laserCloud(new pcl::PointCloud<pcl::PointXYZI>());
 pcl::PointCloud<pcl::PointXYZI>::Ptr
@@ -222,12 +225,14 @@ int main(int argc, char **argv) {
   nhPrivate.getParam("minRelZ", minRelZ);
   nhPrivate.getParam("maxRelZ", maxRelZ);
   nhPrivate.getParam("disRatioZ", disRatioZ);
+  nhPrivate.getParam("odom_topic", odom_topic);
+  nhPrivate.getParam("reg_scan_topic", reg_scan_topic);
 
   ros::Subscriber subOdometry =
-      nh.subscribe<nav_msgs::Odometry>("/state_estimation", 5, odometryHandler);
+      nh.subscribe<nav_msgs::Odometry>(odom_topic, 5, odometryHandler);
 
   ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>(
-      "/registered_scan", 5, laserCloudHandler);
+      reg_scan_topic, 5, laserCloudHandler);
 
   ros::Subscriber subJoystick =
       nh.subscribe<sensor_msgs::Joy>("/joy", 5, joystickHandler);

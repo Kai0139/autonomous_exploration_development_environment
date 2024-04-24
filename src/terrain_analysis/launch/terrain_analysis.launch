@@ -1,4 +1,6 @@
 <launch>
+  <arg name="reg_scan_topic" default="/cloud_registered"/>
+  <arg name="odom_topic" default="/Odometry"/>
 
   <node pkg="terrain_analysis" type="terrainAnalysis" name="terrainAnalysis" output="screen" required="true">
     <param name="scanVoxelSize" type="double" value="0.05" />
@@ -25,8 +27,10 @@
     <param name="voxelPointUpdateThre" type="int" value="100" />
     <param name="voxelTimeUpdateThre" type="double" value="2.0" />
     <param name="minRelZ" type="double" value="-2.5" />
-    <param name="maxRelZ" type="double" value="1.0" />
+    <param name="maxRelZ" type="double" value="2.0" />
     <param name="disRatioZ" type="double" value="0.2" />
+    <param name="reg_scan_topic" type="string" value="$(arg reg_scan_topic)"/>
+    <param name="odom_topic" type="string" value="$(arg odom_topic)"/>
   </node>
 
 </launch>
