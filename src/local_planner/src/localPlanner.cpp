@@ -91,6 +91,7 @@ const int gridVoxelNum = gridVoxelNumX * gridVoxelNumY;
 
 string odom_topic;
 string reg_scan_topic;
+string terrain_topic;
 
 pcl::PointCloud<pcl::PointXYZI>::Ptr laserCloud(new pcl::PointCloud<pcl::PointXYZI>());
 pcl::PointCloud<pcl::PointXYZI>::Ptr laserCloudCrop(new pcl::PointCloud<pcl::PointXYZI>());
@@ -541,6 +542,7 @@ int main(int argc, char** argv)
 
   nhPrivate.getParam("odom_topic", odom_topic);
   nhPrivate.getParam("reg_scan_topic", reg_scan_topic);
+  nhPrivate.getParam("terrain_topic", terrain_topic);
 
   ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>
                                 (odom_topic, 5, odometryHandler);
@@ -549,7 +551,7 @@ int main(int argc, char** argv)
                                   (reg_scan_topic, 5, laserCloudHandler);
 
   ros::Subscriber subTerrainCloud = nh.subscribe<sensor_msgs::PointCloud2>
-                                    ("/terrain_map", 5, terrainCloudHandler);
+                                    (terrain_topic, 5, terrainCloudHandler);
 
   ros::Subscriber subJoystick = nh.subscribe<sensor_msgs::Joy> ("/joy", 5, joystickHandler);
 

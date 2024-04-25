@@ -70,7 +70,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr laserCloudDwz(new pcl::PointCloud<pcl::Poin
 pcl::PointCloud<pcl::PointXYZI>::Ptr terrainCloud(new pcl::PointCloud<pcl::PointXYZI>());
 pcl::PointCloud<pcl::PointXYZI>::Ptr terrainCloudElev(new pcl::PointCloud<pcl::PointXYZI>());
 pcl::PointCloud<pcl::PointXYZI>::Ptr terrainCloudLocal(new pcl::PointCloud<pcl::PointXYZI>());
-pcl::PointCloud<pcl::PointXYZI>::Ptr terrainVoxelCloud[terrainVoxelNum];
+vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> terrainVoxelCloud(terrainVoxelNum);
 
 int terrainVoxelUpdateNum[terrainVoxelNum] = { 0 };
 float terrainVoxelUpdateTime[terrainVoxelNum] = { 0 };
@@ -123,6 +123,7 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloud2)
   pcl::PointXYZI point;
   laserCloudCrop->clear();
   int laserCloudSize = laserCloud->points.size();
+  // laserCloudCrop->points.reserve(laserCloudSize);
   for (int i = 0; i < laserCloudSize; i++)
   {
     point = laserCloud->points[i];
@@ -194,6 +195,7 @@ int main(int argc, char** argv)
   nhPrivate.getParam("localTerrainMapRadius", localTerrainMapRadius);
   nhPrivate.getParam("odom_topic", odom_topic);
   nhPrivate.getParam("reg_scan_topic", reg_scan_topic);
+  nhPrivate.getParam("terrainVoxelSize", terrainVoxelSize);
 
   ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>(odom_topic, 5, odometryHandler);
 
@@ -320,6 +322,22 @@ int main(int argc, char** argv)
         {
           terrainVoxelCloud[terrainVoxelWidth * indX + indY]->push_back(point);
           terrainVoxelUpdateNum[terrainVoxelWidth * indX + indY]++;
+          // ROS_INFO("pushed point to x=%d, y=%d", indX, indY);
+        }
+      }
+
+      // VIPBOT Modifications for ouster os1 specifically: Fill in blank terrain voxels
+      int half_idx = terrainVoxelWidth * terrainVoxelHalfWidth;
+      for(int idx=0; idx<terrainVoxelCloud.size(); idx++)
+      {
+        int x_loc = idx / terrainVoxelWidth;
+        int y_loc = idx % terrainVoxelWidth;
+        if(x_loc < terrainVoxelHalfWidth + 3 && x_loc >  terrainVoxelHalfWidth - 3 && y_loc < terrainVoxelHalfWidth + 3 && y_loc > terrainVoxelHalfWidth - 3 )
+        {
+          if(terrainVoxelCloud[idx]->size() == 0)
+          {
+            ROS_INFO("terrain voxel %d of %d is empty, xloc = %d, yloc = %d", idx, terrainVoxelCloud.size(), x_loc, y_loc);
+          }
         }
       }
 
@@ -335,6 +353,7 @@ int main(int argc, char** argv)
           downSizeFilter.filter(*laserCloudDwz);
 
           terrainVoxelCloudPtr->clear();
+          // ROS_INFO("cleared terrain voxel %d", ind);
           int laserCloudDwzSize = laserCloudDwz->points.size();
           for (int i = 0; i < laserCloudDwzSize; i++)
           {
@@ -423,7 +442,7 @@ int main(int argc, char** argv)
         for (int i = 0; i < planarVoxelNum; i++)
         {
           int planarPointElevSize = planarPointElev[i].size();
-          if (planarPointElevSize > 0)
+          if (planarPointElevSize >= 0)
           {
             float minZ = 1000.0;
             int minID = -1;
@@ -436,7 +455,15 @@ int main(int argc, char** argv)
               }
             }
 
-            if (minID != -1)
+            // if (minID != -1)
+            // {
+            //   planarVoxelElev[i] = planarPointElev[i][minID];
+            // }
+            if (planarPointElev[i].size() == 0)
+            {
+              planarVoxelElev[i] = vehicleZ + terrainUnderVehicle;
+            }
+            else
             {
               planarVoxelElev[i] = planarPointElev[i][minID];
             }
