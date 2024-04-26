@@ -58,7 +58,7 @@ double disRatioZ = 0.2;
 float terrainVoxelSize = 1.0;
 int terrainVoxelShiftX = 0;
 int terrainVoxelShiftY = 0;
-const int terrainVoxelWidth = 21;
+const int terrainVoxelWidth = 61;
 int terrainVoxelHalfWidth = (terrainVoxelWidth - 1) / 2;
 const int terrainVoxelNum = terrainVoxelWidth * terrainVoxelWidth;
 
@@ -225,8 +225,9 @@ int main(int argc, char **argv) {
   nhPrivate.getParam("minRelZ", minRelZ);
   nhPrivate.getParam("maxRelZ", maxRelZ);
   nhPrivate.getParam("disRatioZ", disRatioZ);
-  nhPrivate.getParam("odom_topic", odom_topic);
   nhPrivate.getParam("reg_scan_topic", reg_scan_topic);
+  nhPrivate.getParam("odom_topic", odom_topic);
+  nhPrivate.getParam("terrainVoxelSize", terrainVoxelSize);
 
   ros::Subscriber subOdometry =
       nh.subscribe<nav_msgs::Odometry>(odom_topic, 5, odometryHandler);
@@ -585,7 +586,9 @@ int main(int argc, char **argv) {
         }
       }
 
-      if (noDataObstacle && noDataInited == 2) {
+      // if (noDataObstacle && noDataInited == 2) {
+      if (noDataObstacle) {
+        ROS_WARN("no data obs");
         for (int i = 0; i < planarVoxelNum; i++) {
           int planarPointElevSize = planarPointElev[i].size();
           if (planarPointElevSize < minBlockPointNum) {
@@ -629,20 +632,26 @@ int main(int argc, char **argv) {
             point.y =
                 planarVoxelSize * (indY - planarVoxelHalfWidth) + vehicleY;
             point.z = vehicleZ;
+            // point.z = 0;
             point.intensity = vehicleHeight;
+            // point.intensity = 0;
 
             point.x -= planarVoxelSize / 4.0;
             point.y -= planarVoxelSize / 4.0;
             terrainCloudElev->push_back(point);
+            // ROS_INFO("adding point to voxel (%d, %d) : x=%f, y=%f, z=%f, i=%f", indX, indY, point.x, point.y, point.z, point.intensity);
 
             point.x += planarVoxelSize / 2.0;
             terrainCloudElev->push_back(point);
+            // ROS_INFO("adding point to voxel (%d, %d) : x=%f, y=%f, z=%f, i=%f", indX, indY, point.x, point.y, point.z, point.intensity);
 
             point.y += planarVoxelSize / 2.0;
             terrainCloudElev->push_back(point);
+            // ROS_INFO("adding point to voxel (%d, %d) : x=%f, y=%f, z=%f, i=%f", indX, indY, point.x, point.y, point.z, point.intensity);
 
             point.x -= planarVoxelSize / 2.0;
             terrainCloudElev->push_back(point);
+            // ROS_INFO("adding point to voxel (%d, %d) : x=%f, y=%f, z=%f, i=%f", indX, indY, point.x, point.y, point.z, point.intensity);
           }
         }
       }

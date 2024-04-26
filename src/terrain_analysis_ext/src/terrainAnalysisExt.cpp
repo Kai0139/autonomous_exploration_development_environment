@@ -51,7 +51,7 @@ double localTerrainMapRadius = 4.0;
 float terrainVoxelSize = 2.0;
 int terrainVoxelShiftX = 0;
 int terrainVoxelShiftY = 0;
-const int terrainVoxelWidth = 41;
+const int terrainVoxelWidth = 61;
 int terrainVoxelHalfWidth = (terrainVoxelWidth - 1) / 2;
 const int terrainVoxelNum = terrainVoxelWidth * terrainVoxelWidth;
 
@@ -336,7 +336,7 @@ int main(int argc, char** argv)
         {
           if(terrainVoxelCloud[idx]->size() == 0)
           {
-            ROS_INFO("terrain voxel %d of %d is empty, xloc = %d, yloc = %d", idx, terrainVoxelCloud.size(), x_loc, y_loc);
+            // ROS_INFO("terrain voxel %d of %d is empty, xloc = %d, yloc = %d", idx, terrainVoxelCloud.size(), x_loc, y_loc);
           }
         }
       }

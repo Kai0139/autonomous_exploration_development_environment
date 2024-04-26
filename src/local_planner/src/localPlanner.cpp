@@ -50,7 +50,7 @@ double groundHeightThre = 0.1;
 double costHeightThre = 0.1;
 double costScore = 0.02;
 bool useCost = false;
-const int laserCloudStackNum = 1;
+const int laserCloudStackNum = 5;
 int laserCloudCount = 0;
 int pointPerPathThre = 2;
 double minRelZ = -0.5;
@@ -572,7 +572,7 @@ int main(int argc, char** argv)
   ros::Publisher pubFreePaths = nh.advertise<sensor_msgs::PointCloud2> ("/free_paths", 2);
   #endif
 
-  //ros::Publisher pubLaserCloud = nh.advertise<sensor_msgs::PointCloud2> ("/stacked_scans", 2);
+  ros::Publisher pubLaserCloud = nh.advertise<sensor_msgs::PointCloud2> ("/stacked_scans", 2);
 
   printf ("\nReading path files.\n");
 
@@ -943,11 +943,11 @@ int main(int argc, char** argv)
         #endif
       }
 
-      /*sensor_msgs::PointCloud2 plannerCloud2;
+      sensor_msgs::PointCloud2 plannerCloud2;
       pcl::toROSMsg(*plannerCloudCrop, plannerCloud2);
       plannerCloud2.header.stamp = ros::Time().fromSec(odomTime);
       plannerCloud2.header.frame_id = "vehicle";
-      pubLaserCloud.publish(plannerCloud2);*/
+      pubLaserCloud.publish(plannerCloud2);
     }
 
     status = ros::ok();

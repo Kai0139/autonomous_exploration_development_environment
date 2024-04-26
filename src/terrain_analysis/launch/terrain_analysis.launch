@@ -4,8 +4,9 @@
 
   <node pkg="terrain_analysis" type="terrainAnalysis" name="terrainAnalysis" output="screen" required="true">
     <param name="scanVoxelSize" type="double" value="0.05" />
+    <param name="terrainVoxelSize" type="double" value="1.0" />
     <param name="decayTime" type="double" value="2.0" />
-    <param name="noDecayDis" type="double" value="4.0" />
+    <param name="noDecayDis" type="double" value="2.0" />
     <param name="clearingDis" type="double" value="8.0" />
     <param name="useSorting" type="bool" value="false" />
     <param name="quantileZ" type="double" value="0.25" />
@@ -19,7 +20,7 @@
     <param name="absDyObsRelZThre" type="double" value="0.2" />
     <param name="minDyObsVFOV" type="double" value="-16.0" />
     <param name="maxDyObsVFOV" type="double" value="16.0" />
-    <param name="minDyObsPointNum" type="int" value="1" />
+    <param name="minDyObsPointNum" type="int" value="4" />
     <param name="noDataObstacle" type="bool" value="false" />
     <param name="noDataBlockSkipNum" type="int" value="0" />
     <param name="minBlockPointNum" type="int" value="10" />
