@@ -10,8 +10,8 @@
   <arg name="joyToSpeedDelay" default="2.0"/>
   <arg name="goalX" default="0"/>
   <arg name="goalY" default="0"/>
-  <arg name="reg_scan_topic" default="/cloud_registered"/>
-  <arg name="odom_topic" default="/Odometry"/>
+  <arg name="reg_scan_topic" default="/corrected_current_pcd"/>
+  <arg name="odom_topic" default="/pose_stamped"/>
   <arg name="terrain_topic" default="/terrain_map_ext"/>
 
   <node pkg="local_planner" type="localPlanner" name="localPlanner" output="screen" required="true">

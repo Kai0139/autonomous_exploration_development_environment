@@ -144,6 +144,22 @@ void odometryHandler(const nav_msgs::Odometry::ConstPtr& odom)
   vehicleZ = odom->pose.pose.position.z;
 }
 
+void poseStampedHandler(const geometry_msgs::PoseStamped::ConstPtr& ps)
+{
+  odomTime = ps->header.stamp.toSec();
+
+  double roll, pitch, yaw;
+  geometry_msgs::Quaternion geoQuat = ps->pose.orientation;
+  tf::Matrix3x3(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w)).getRPY(roll, pitch, yaw);
+
+  vehicleRoll = roll;
+  vehiclePitch = pitch;
+  vehicleYaw = yaw;
+  vehicleX = ps->pose.position.x - cos(yaw) * sensorOffsetX + sin(yaw) * sensorOffsetY;
+  vehicleY = ps->pose.position.y - sin(yaw) * sensorOffsetX - cos(yaw) * sensorOffsetY;
+  vehicleZ = ps->pose.position.z;
+}
+
 void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloud2)
 {
   if (!useTerrainAnalysis) {
@@ -544,8 +560,12 @@ int main(int argc, char** argv)
   nhPrivate.getParam("reg_scan_topic", reg_scan_topic);
   nhPrivate.getParam("terrain_topic", terrain_topic);
 
-  ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>
-                                (odom_topic, 5, odometryHandler);
+  // ros::Subscriber subOdometry = nh.subscribe<nav_msgs::Odometry>
+  //                               (odom_topic, 5, odometryHandler);
+
+  ros::Subscriber subOdometry = nh.subscribe<geometry_msgs::PoseStamped>
+                                (odom_topic, 5, poseStampedHandler);
+
 
   ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>
                                   (reg_scan_topic, 5, laserCloudHandler);

@@ -119,6 +119,30 @@ void odomHandler(const nav_msgs::Odometry::ConstPtr& odomIn)
   }
 }
 
+void psHandler(const geometry_msgs::PoseStamped::ConstPtr& odomIn)
+{
+  odomTime = odomIn->header.stamp.toSec();
+
+  double roll, pitch, yaw;
+  geometry_msgs::Quaternion geoQuat = odomIn->pose.orientation;
+  tf::Matrix3x3(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w)).getRPY(roll, pitch, yaw);
+
+  vehicleRoll = roll;
+  vehiclePitch = pitch;
+  vehicleYaw = yaw;
+  vehicleX = odomIn->pose.position.x - cos(yaw) * sensorOffsetX + sin(yaw) * sensorOffsetY;
+  vehicleY = odomIn->pose.position.y - sin(yaw) * sensorOffsetX - cos(yaw) * sensorOffsetY;
+  vehicleZ = odomIn->pose.position.z;
+
+  if ((fabs(roll) > inclThre * PI / 180.0 || fabs(pitch) > inclThre * PI / 180.0) && useInclToStop) {
+    stopInitTime = odomIn->header.stamp.toSec();
+  }
+
+  // if ((fabs(odomIn->twist.twist.angular.x) > inclRateThre * PI / 180.0 || fabs(odomIn->twist.twist.angular.y) > inclRateThre * PI / 180.0) && useInclRateToSlow) {
+  //   slowInitTime = odomIn->header.stamp.toSec();
+  // }
+}
+
 void pathHandler(const nav_msgs::Path::ConstPtr& pathIn)
 {
   int pathSize = pathIn->poses.size();
@@ -216,7 +240,8 @@ int main(int argc, char** argv)
   nhPrivate.getParam("joyToSpeedDelay", joyToSpeedDelay);
   nhPrivate.getParam("odom_topic", odom_topic);
 
-  ros::Subscriber subOdom = nh.subscribe<nav_msgs::Odometry> (odom_topic, 5, odomHandler);
+  // ros::Subscriber subOdom = nh.subscribe<nav_msgs::Odometry> (odom_topic, 5, odomHandler);
+  ros::Subscriber subOdom = nh.subscribe<geometry_msgs::PoseStamped> (odom_topic, 5, psHandler);
 
   ros::Subscriber subPath = nh.subscribe<nav_msgs::Path> ("/path", 5, pathHandler);
 
