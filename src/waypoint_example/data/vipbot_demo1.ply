@@ -1,9 +1,18 @@
 ply
 format ascii 1.0
-element vertex 2
+element vertex 11
 property float x
 property float y
 property float z
 end_header
-0.0      0.0	0
-1.0      0.0    0
+0       0       0
+1.15    -0.06	0
+3.95    -0.9    0
+6.87    -0.882  0
+8.09    -2.92   0
+5.74    -3.97   0
+5.30    -7.15   0
+2.50    -7.45   0
+0.70    -4.89   0
+0.60    -1.59   0
+0       0       0

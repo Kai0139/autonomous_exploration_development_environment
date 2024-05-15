@@ -148,11 +148,20 @@ void readBoundaryFile()
 // vehicle pose callback function
 void poseHandler(const nav_msgs::Odometry::ConstPtr& pose)
 {
-  curTime = pose->header.stamp.toSec();
+  // curTime = pose->header.stamp.toSec();
 
   vehicleX = pose->pose.pose.position.x;
   vehicleY = pose->pose.pose.position.y;
   vehicleZ = pose->pose.pose.position.z;
+}
+
+void poseStampedHandler(const geometry_msgs::PoseStamped::ConstPtr& pose)
+{
+  // curTime = pose->header.stamp.toSec();
+
+  vehicleX = pose->pose.position.x;
+  vehicleY = pose->pose.position.y;
+  vehicleZ = pose->pose.position.z;
 }
 
 int main(int argc, char** argv)
@@ -171,7 +180,8 @@ int main(int argc, char** argv)
   nhPrivate.getParam("sendSpeed", sendSpeed);
   nhPrivate.getParam("sendBoundary", sendBoundary);
 
-  ros::Subscriber subPose = nh.subscribe<nav_msgs::Odometry> ("/state_estimation", 5, poseHandler);
+  // ros::Subscriber subPose = nh.subscribe<nav_msgs::Odometry> ("/state_estimation", 5, poseHandler);
+  ros::Subscriber subPose = nh.subscribe<geometry_msgs::PoseStamped> ("/pose_stamped", 5, poseStampedHandler);
 
   ros::Publisher pubWaypoint = nh.advertise<geometry_msgs::PointStamped> ("/way_point", 5);
   geometry_msgs::PointStamped waypointMsgs;
@@ -210,23 +220,34 @@ int main(int argc, char** argv)
 
   ros::Rate rate(100);
   bool status = ros::ok();
+  for(int i=0; i<waypoints->size(); i++)
+  {
+    // std::cout << waypoints->points[i].x << "";
+    ROS_INFO("Waypoint %i: x=%f, y=%f, z=%f", i, waypoints->points[i].x, waypoints->points[i].y, waypoints->points[i].z);
+  }
   while (status) {
     ros::spinOnce();
-
+    curTime = ros::Time::now().toSec();
     float disX = vehicleX - waypoints->points[wayPointID].x;
     float disY = vehicleY - waypoints->points[wayPointID].y;
     float disZ = vehicleZ - waypoints->points[wayPointID].z;
+
+    ROS_INFO_THROTTLE(0.5, "dis x=%f, y=%f, z=%f", disX, disY, disZ);
 
     // start waiting if the current waypoint is reached
     if (sqrt(disX * disX + disY * disY) < waypointXYRadius && fabs(disZ) < waypointZBound && !isWaiting) {
       waitTimeStart = curTime;
       isWaiting = true;
+      ROS_WARN("is waiting set true");
     }
 
     // move to the next waypoint after waiting is over
-    if (isWaiting && waitTimeStart + waitTime < curTime && wayPointID < waypointSize - 1) {
+    // ROS_INFO_THROTTLE(0.5, "waitTimeStart: %f, waitTime: %f, curTime: %f, wayPointID: %i, waypontSize %i", waitTimeStart, waitTime, curTime, wayPointID, waypointSize);
+    // if (isWaiting && waitTimeStart + waitTime < curTime && wayPointID < waypointSize - 1) {
+    if (isWaiting && wayPointID < waypointSize - 1) {
       wayPointID++;
       isWaiting = false;
+      ROS_WARN("go to next wp");
     }
 
     // publish waypoint, speed, and boundary messages at certain frame rate
